@@ -1,0 +1,36 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - main  # Deploy når kode pushes til main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with: # Bruk Service Account Key for å autentisere
+          credentials: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: "exam-405815"  # Sørg for at dette er riktig Project ID
+
+      - name: Build and Push Docker image
+        run: |
+          gcloud builds submit --tag gcr.io/exam-405815/transcription2025
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy transcription2025 \
+            --image gcr.io/exam-405815/transcription2025 \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated

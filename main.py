@@ -124,3 +124,7 @@ async def generate_rapport(rapport_request: RapportRequest):
 @app.get("/", tags=["health"])
 def health_check():
     return {"message": "API is running"}
+    
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
